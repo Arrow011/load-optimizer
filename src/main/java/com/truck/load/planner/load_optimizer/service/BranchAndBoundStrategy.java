@@ -1,17 +1,19 @@
 package com.truck.load.planner.load_optimizer.service;
+
 import com.truck.load.planner.load_optimizer.model.OptimizeResponse;
 import com.truck.load.planner.load_optimizer.model.Truck;
 import org.springframework.stereotype.Service;
+
 import java.math.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
 import com.truck.load.planner.load_optimizer.model.Order;
 
 @Service
-public class BranchAndBoundStrategy
-        implements OptimizationStrategy {
+public class BranchAndBoundStrategy implements OptimizationStrategy {
 
     private final ConstraintValidator validator;
 
@@ -49,27 +51,21 @@ public class BranchAndBoundStrategy
         return buildResponse(truck);
     }
 
-    private void buildRemainingPayout(
-            List<Order> orders) {
+    private void buildRemainingPayout(List<Order> orders) {
 
-        remainingPayout =
-                new long[orders.size() + 1];
+        remainingPayout = new long[orders.size() + 1];
 
-        for (int i = orders.size() - 1;
-             i >= 0;
-             i--) {
+        for (int i = orders.size() - 1; i >= 0; i--) {
 
-            remainingPayout[i] =
-                    remainingPayout[i + 1]
-                            + orders.get(i)
+            remainingPayout[i] = remainingPayout[i + 1] + orders.get(i)
                             .payout_cents();
         }
     }
 
     private void dfs(int index, List<Order> orders, Truck truck, List<Order> selected,
-            long payout,
-            long weight,
-            long volume) {
+                     long payout,
+                     long weight,
+                     long volume) {
 
         if (weight > truck.max_weight_lbs()) {
             return;
@@ -101,8 +97,8 @@ public class BranchAndBoundStrategy
         Order current = orders.get(index);
 
         boolean valid = validator.isRouteCompatible(selected, current) &&
-                        validator.isTimeCompatible(current) &&
-                        validator.isHazmatCompatible(selected, current);
+                validator.isTimeCompatible(current) &&
+                validator.isHazmatCompatible(selected, current);
 
         if (valid) {
 
